@@ -23,7 +23,9 @@ const FeaturedSkillSwaps = ({ users = [] }) => {
         {userArray.map((user, index) => (
           <SkillCard
             key={user?.clerkId || index}
-            imageUrl={user?.profilePic}
+            imageUrl={
+              user?.profilePicture.uri || "https://avatar.iran.liara.run/public"
+            }
             name={user?.name || "Anonymous"}
             email={user?.email}
             skillsOffered={user?.skillsOffered || []}
