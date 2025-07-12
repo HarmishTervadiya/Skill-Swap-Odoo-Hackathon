@@ -1,0 +1,27 @@
+{
+  "name": "skill-swap-odoo-hackathon",
+  "version": "1.0.0",
+  "description": "A mini web application enabling users to exchange skills with others in the community.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "run",
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
+  },
+  "author": "Harmis Tervadiya",
+  "license": "ISC",
+  "dependencies": {
+    "cloudinary": "^2.7.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "mongodb": "^6.17.0",
+    "mongoose": "^8.16.3",
+    "multer": "^2.0.1",
+    "prettier": "^3.6.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
