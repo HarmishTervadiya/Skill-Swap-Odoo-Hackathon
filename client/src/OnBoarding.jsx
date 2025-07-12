@@ -1,8 +1,65 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "./components/Header";
-
+import axios from "axios";
+import { useUser, UserButton } from "@clerk/clerk-react";
 function OnBoarding() {
+  const { user } = useUser();
+  // const [loading, setLoading] = useState(false);
+  // const [response, setResponse] = useState(null);
+  // const [error, setError] = useState(null);
+  const sendDataToBackend = async () => {
+    if (!user) return; // Don't send if user is not loaded yet
+
+    // setLoading(true);
+    // setError(null);
+    // setResponse(null);
+
+    try {
+      // Send user ID to backend with Google profile picture
+      const userData = {
+        clerkId: user?.id,
+        email: user?.emailAddresses[0]?.emailAddress,
+        name: user?.firstName,
+        profilePic: user?.imageUrl, // Google profile picture URL
+        // googleId: user?.externalAccounts?.[0]?.externalId, // Google account ID
+      };
+
+      console.log("Sending data:", userData);
+
+      const response = await axios.post(
+        "http://localhost:8000/api/v1/users",
+        userData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Response:", response.data);
+      setResponse(response.data);
+    } catch (error) {
+      console.error("Error details:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+
+      setError({
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Automatically send data when component loads and user is available
+  useEffect(() => {
+    if (user) {
+      sendDataToBackend();
+    }
+  }, [user]); //
   return (
     <>
       <div className="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden">

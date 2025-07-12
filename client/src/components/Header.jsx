@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { UserButton } from "@clerk/clerk-react";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -41,18 +42,18 @@ const Header = () => {
             Home
           </Link>
           <Link
-            to="/dashboard"
+            to="/OnBoarding"
             className="text-[#111418] text-sm font-medium leading-normal no-underline hover:text-[#0c77f2] transition-colors"
           >
-            Dashboard
+            OnBoarding
           </Link>
 
-          <a
+          <Link
+            to="/Profile"
             className="text-[#111418] text-sm font-medium leading-normal no-underline hover:text-[#0c77f2] transition-colors"
-            href="#"
           >
-            Messages
-          </a>
+            Profile
+          </Link>
         </div>
       </div>
 
@@ -88,13 +89,7 @@ const Header = () => {
 
       {/* Desktop Search and Profile */}
       <div className="hidden md:flex items-center gap-3 lg:gap-4 xl:gap-8">
-        <div
-          className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 sm:size-10 cursor-pointer"
-          style={{
-            backgroundImage:
-              "url(https://lh3.googleusercontent.com/aida-public/AB6AXuAWxwI_chr5F9Qbm_wa2_T8y0zIxHES56CPwz4FrWcPr70uZQv4oJU298ZSKHvMdMrZ3VqnkeyF4WsHNz0BG7UPGARFoIxU3grj1iruzVVpcslq8oaVg5Ty2q2VeCAh86eGkCNkOW1Z7ieNmPhEcPVB4iGbdLSfeMChxnfBYVhP1DRlXgkzXM2aLnhGxLlMLJtHAgkCKfU6rArC7l04UIahHLFWuWKs6JuDV-8jmVFj-q9yAQccsFg1SWPIj7Zi-7FpR-AA3zRP)",
-          }}
-        ></div>
+        <UserButton afterSignOutUrl="/sign-in" />
       </div>
 
       {/* Mobile Menu */}
@@ -109,11 +104,11 @@ const Header = () => {
               Home
             </Link>
             <Link
-              to="/dashboard"
+              to="/OnBoarding"
               className="block text-[#111418] text-sm font-medium leading-normal no-underline hover:text-[#0c77f2] py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
-              Dashboard
+              OnBoarding
             </Link>
             <Link
               to="/search"
@@ -130,28 +125,7 @@ const Header = () => {
               Messages
             </a>
 
-            {/* Mobile Search */}
-            <div className="pt-2 border-t border-gray-100">
-              <label className="flex flex-col w-full">
-                <div className="flex w-full items-stretch rounded-lg h-10">
-                  <div className="text-[#60748a] flex border-none bg-[#f0f2f5] items-center justify-center pl-3 rounded-l-lg border-r-0">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="18px"
-                      height="18px"
-                      fill="currentColor"
-                      viewBox="0 0 256 256"
-                    >
-                      <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
-                    </svg>
-                  </div>
-                  <input
-                    placeholder="Search"
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#111418] focus:outline-0 focus:ring-0 border-none bg-[#f0f2f5] focus:border-none h-full placeholder:text-[#60748a] px-3 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal"
-                  />
-                </div>
-              </label>
-            </div>
+            <UserButton afterSignOutUrl="/sign-in" />
           </div>
         </div>
       )}
