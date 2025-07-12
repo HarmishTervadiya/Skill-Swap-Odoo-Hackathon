@@ -47,11 +47,11 @@ function Search() {
       console.log("Is array:", Array.isArray(response.data));
 
       // Handle different response structures
-      let usersData = response.data;
+      let usersData = response.data.users;
       if (response.data && response.data.users) {
-        usersData = response.data.users;
-      } else if (response.data && response.data.data) {
-        usersData = response.data.data;
+        usersData = response.data.data.users;
+      } else if (response.data && response.data.data.users) {
+        usersData = response.data.data.users;
       }
 
       // Ensure it's an array

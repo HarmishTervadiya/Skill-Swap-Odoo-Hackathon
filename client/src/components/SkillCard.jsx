@@ -7,6 +7,30 @@ const SkillCard = ({
   skillsOffered = [],
   skillsWanted = [],
 }) => {
+  // Helper function to safely convert values to strings
+  const safeString = (value) => {
+    if (typeof value === "string") return value;
+    if (typeof value === "number") return value.toString();
+    if (value && typeof value === "object") {
+      // If it's an object with a name property, use that
+      if (value.name) return value.name;
+      // Otherwise, stringify it
+      return JSON.stringify(value);
+    }
+    return "";
+  };
+
+  // Helper function to safely handle arrays
+  const safeArray = (value) => {
+    if (Array.isArray(value)) return value;
+    return [];
+  };
+
+  const displayName = safeString(name) || "Anonymous";
+  const displayEmail = safeString(email) || "";
+  const displaySkillsOffered = safeArray(skillsOffered);
+  const displaySkillsWanted = safeArray(skillsWanted);
+
   return (
     <div className="flex flex-col gap-2 sm:gap-3 pb-2 sm:pb-3">
       <div
@@ -29,46 +53,46 @@ const SkillCard = ({
       </div>
       <div>
         <p className="text-[#111418] text-sm sm:text-base font-medium leading-normal">
-          {name}
+          {displayName}
         </p>
         <p className="text-[#60748a] text-xs sm:text-sm font-normal leading-normal">
-          {email}
+          {displayEmail}
         </p>
-        {skillsOffered.length > 0 && (
+        {displaySkillsOffered.length > 0 && (
           <div className="mt-1">
             <p className="text-[#60748a] text-xs font-medium">Offering:</p>
             <div className="flex flex-wrap gap-1 mt-1">
-              {skillsOffered.slice(0, 2).map((skill, index) => (
+              {displaySkillsOffered.slice(0, 2).map((skill, index) => (
                 <span
                   key={index}
                   className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded"
                 >
-                  {skill}
+                  {safeString(skill)}
                 </span>
               ))}
-              {skillsOffered.length > 2 && (
+              {displaySkillsOffered.length > 2 && (
                 <span className="text-xs text-gray-500">
-                  +{skillsOffered.length - 2} more
+                  +{displaySkillsOffered.length - 2} more
                 </span>
               )}
             </div>
           </div>
         )}
-        {skillsWanted.length > 0 && (
+        {displaySkillsWanted.length > 0 && (
           <div className="mt-1">
             <p className="text-[#60748a] text-xs font-medium">Seeking:</p>
             <div className="flex flex-wrap gap-1 mt-1">
-              {skillsWanted.slice(0, 2).map((skill, index) => (
+              {displaySkillsWanted.slice(0, 2).map((skill, index) => (
                 <span
                   key={index}
                   className="text-xs bg-green-100 text-green-800 px-1 py-0.5 rounded"
                 >
-                  {skill}
+                  {safeString(skill)}
                 </span>
               ))}
-              {skillsWanted.length > 2 && (
+              {displaySkillsWanted.length > 2 && (
                 <span className="text-xs text-gray-500">
-                  +{skillsWanted.length - 2} more
+                  +{displaySkillsWanted.length - 2} more
                 </span>
               )}
             </div>
