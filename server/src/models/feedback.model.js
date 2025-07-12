@@ -2,11 +2,6 @@ import mongoose from "mongoose";
 
 const feedbackSchema = new mongoose.Schema(
   {
-    swapRequest: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "SwapRequest",
-      required: true,
-    },
     reviewer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -32,7 +27,7 @@ const feedbackSchema = new mongoose.Schema(
 );
 
 feedbackSchema.index({ reviewee: 1 });
-feedbackSchema.index({ swapRequest: 1 }, { unique: true });
+feedbackSchema.index({ reviewer: 1, reviewee: 1 }, { unique: true });
 
 const Feedback = new mongoose.model("Feedback", feedbackSchema);
 
