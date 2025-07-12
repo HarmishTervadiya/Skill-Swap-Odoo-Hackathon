@@ -8,6 +8,8 @@ import {
     updateWantedSkills,
     updateAllSkills,
     searchUsersBySkill,
+    getUserSwapRequests,
+    getUserFeedback,
     getAllUsers,
     toggleUserBan,
     changeUserRole,
@@ -18,25 +20,30 @@ import { authenticateUser, authenticateAdmin } from "../middlewares/auth.middlew
 
 const router = Router();
 
+// User creation route (no auth required)
 router.post('/', 
     upload.single('pic'),
     createUser);
 
+// Search and browse routes (public - no auth required)
 router.get('/search', searchUsersBySkill);
 
-// User profile routes 
-router.get('/profile/:userId', getUserProfile);  
+// User profile routes (public read, authenticated update)
+router.get('/profile/:userId', getUserProfile);  // Public - anyone can view public profiles
 router.patch('/profile/:userId', authenticateUser, updateUserProfile);
 router.patch('/profile/:userId/picture', 
     authenticateUser,
     upload.single('pic'),
     updateProfilePicture);
 
-// Skill management routes
+// Skill management routes (authenticated - only owner can update)
 router.patch('/:userId/skills/offered', authenticateUser, updateOfferedSkills);
 router.patch('/:userId/skills/wanted', authenticateUser, updateWantedSkills);
 router.patch('/:userId/skills', authenticateUser, updateAllSkills);
 
+// User data routes (authenticated - only owner can view)
+router.get('/:userId/swap-requests', authenticateUser, getUserSwapRequests);
+router.get('/:userId/feedback', getUserFeedback);  // Public - anyone can view feedback
 
 // Admin routes (admin auth required)
 router.get('/admin/all', authenticateAdmin, getAllUsers);

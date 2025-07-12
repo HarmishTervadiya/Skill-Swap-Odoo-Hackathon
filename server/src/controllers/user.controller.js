@@ -13,11 +13,11 @@ const createUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Request body is required");
     }
     
-    const { clerkId, name, email, location, availability, isPublic } = req.body;
+    const { clerkId, name, email, profilePic, location, availability, isPublic } = req.body;
     
     // Validate required fields
-    if (!clerkId || !name || !email) {
-        throw new ApiError(400, "Clerk ID, name and email are required");
+    if (!clerkId || !name || !email || !profilePic) {
+        throw new ApiError(400, "Clerk ID, name, email and profilePic are required");
     }
     
     // Check if user already exists by clerkId or email
@@ -31,18 +31,6 @@ const createUser = asyncHandler(async (req, res) => {
         throw new ApiError(409, "User with this Clerk ID or email already exists");
     }
 
-    const profilePicLocalPath = req.file?.path
-
-    if (!profilePicLocalPath){
-        throw new ApiError(400, "profilePic file is missing")
-    }
-
-    const profilePic = await uploadToCloudinary(profilePicLocalPath)
-
-    if(!profilePic.url) {
-        throw new ApiError(400, "Error while uploading on avatar")
-    }
-    
     // Create the user
     const user = await User.create({
         clerkId,
@@ -57,7 +45,7 @@ const createUser = asyncHandler(async (req, res) => {
             average: 0,
             count: 0
         },
-        profilePicture: {publicId: profilePic.public_id, uri: profilePic.url},
+        profilePicture: {publicId: '', uri: profilePic},
         isBanned: false
     });
     
@@ -368,6 +356,94 @@ const searchUsersBySkill = asyncHandler(async (req, res) => {
     );
 });
 
+const getUserSwapRequests = asyncHandler(async (req, res) => {
+    const { userId } = req.params;
+    const { status, type = 'all' } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    
+    if (!req.user || (req.user._id.toString() !== userId && req.user.role !== 'admin')) {
+        throw new ApiError(403, "You can only view your own swap requests");
+    }
+    
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+    
+    // Build query based on type
+    let query = {};
+    if (type === 'sent') {
+        query.requester = userId;
+    } else if (type === 'received') {
+        query.receiver = userId;
+    } else {
+        query.$or = [
+            { requester: userId },
+            { receiver: userId }
+        ];
+    }
+    
+    if (status) {
+        query.status = status;
+    }
+    
+    const swapRequests = await SwapRequest.find(query)
+        .populate('requester', 'name email profilePicture')
+        .populate('receiver', 'name email profilePicture')
+        .populate('skillOffered', 'name description')
+        .populate('skillRequested', 'name description')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+    
+    const totalRequests = await SwapRequest.countDocuments(query);
+    const totalPages = Math.ceil(totalRequests / limit);
+    
+    return res.status(200).json(
+        new ApiResponse(200, {
+            swapRequests,
+            totalPages,
+            currentPage: page,
+            totalRequests
+        }, "Swap requests retrieved successfully")
+    );
+});
+
+const getUserFeedback = asyncHandler(async (req, res) => {
+    const { userId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+    
+    const feedback = await Feedback.find({ reviewee: userId })
+        .populate('reviewer', 'name profilePicture')
+        .populate('swapRequest', 'skillOffered skillRequested')
+        .populate('swapRequest.skillOffered', 'name')
+        .populate('swapRequest.skillRequested', 'name')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+    
+    const totalFeedback = await Feedback.countDocuments({ reviewee: userId });
+    const totalPages = Math.ceil(totalFeedback / limit);
+    
+    return res.status(200).json(
+        new ApiResponse(200, {
+            feedback,
+            totalPages,
+            currentPage: page,
+            totalFeedback
+        }, "User feedback retrieved successfully")
+    );
+});
+
 const getAllUsers = asyncHandler(async (req, res) => {
     if (!req.user || req.user.role !== 'admin') {
         throw new ApiError(403, "Admin access required");
@@ -525,6 +601,8 @@ export {
     updateWantedSkills,
     updateAllSkills,
     searchUsersBySkill,
+    getUserSwapRequests,
+    getUserFeedback,
     getAllUsers,
     toggleUserBan,
     changeUserRole,
