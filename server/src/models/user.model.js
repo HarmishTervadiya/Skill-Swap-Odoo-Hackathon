@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
+    clerkId: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
     name: {
       type: String,
       required: true,
@@ -14,8 +20,13 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     profilePicture: {
-      type: { uri: String, publicId: String },
-      default: "https://via.placeholder.com/150",
+      uri: {
+        type: String,
+        default: "https://via.placeholder.com/150",
+      },
+      publicId: {
+        type: String,
+      },
     },
     availability: {
       type: String,
@@ -30,13 +41,13 @@ const userSchema = new mongoose.Schema(
     skillsOffered: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Skills",
+        ref: "Skill",
       },
     ],
     skillsWanted: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Skills",
+        ref: "Skill",
       },
     ],
     rating: {
